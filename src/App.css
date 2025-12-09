@@ -562,6 +562,33 @@
   margin-bottom: 0;
 }
 
+.solved-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--success);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.solved-checkmark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--success);
+  color: #02040a;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 /* Right Panel: Editor */
 .challenge-right {
   display: flex;
@@ -769,6 +796,44 @@
 }
 .challenge-view.fullscreen-mode .resize-handle {
   display: none;
+}
+
+/* Challenge Not Found */
+.challenge-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 3rem;
+}
+
+.challenge-not-found h2 {
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.challenge-not-found p {
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.challenge-not-found button {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.challenge-not-found button:hover {
+  background: #818cf8;
+  transform: translateY(-2px);
 }
 
 /* ===== Responsive Media Queries ===== */

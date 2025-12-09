@@ -134,6 +134,12 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challenge, onBack: _onBac
             <div className="challenge-left">
               <div className="problem-description">
                 <h2>Problem Statement</h2>
+                {solved && (
+                  <div className="solved-status">
+                    <span className="solved-checkmark">✓</span>
+                    <span>Completed</span>
+                  </div>
+                )}
                 <div 
                   className="description-content"
                   dangerouslySetInnerHTML={{ 
