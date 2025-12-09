@@ -9,9 +9,11 @@ interface ChallengeViewProps {
   challenge: Challenge;
   onBack: () => void;
   onSolved: () => void;
+  onNext?: () => void;
+  hasNext?: boolean;
 }
 
-const ChallengeView: React.FC<ChallengeViewProps> = ({ challenge, onBack: _onBack, onSolved }) => {
+const ChallengeView: React.FC<ChallengeViewProps> = ({ challenge, onBack: _onBack, onSolved, onNext, hasNext }) => {
   const [code, setCode] = useState(challenge.starterCode);
   const [results, setResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
@@ -189,6 +191,11 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challenge, onBack: _onBac
                 <button className="run-btn" onClick={runTests} disabled={isRunning}>
                   {isRunning ? 'Running...' : 'Run Code'}
                 </button>
+                {hasNext && (
+                  <button className="next-btn" onClick={onNext}>
+                    Next →
+                  </button>
+                )}
               </div>
             </div>
             <CodeEditor code={code} onChange={setCode} height="100%" />

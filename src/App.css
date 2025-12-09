@@ -666,6 +666,30 @@
   color: var(--text-primary);
 }
 
+.next-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.next-btn:hover {
+  background: #818cf8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
 /* Editor Section */
 .editor-section {
   flex: 1; 

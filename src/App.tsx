@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import type { Challenge, Category, Difficulty } from './types/challenge';
 import { allChallenges } from './data';
 import Header from './components/Header';
@@ -12,6 +12,15 @@ function App() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty | 'all'>('all');
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Get filtered challenges based on current filters
+  const filteredChallenges = useMemo(() => {
+    return allChallenges.filter(c => {
+      const categoryMatch = selectedCategory === 'all' || c.category === selectedCategory;
+      const difficultyMatch = selectedDifficulty === 'all' || c.difficulty === selectedDifficulty;
+      return categoryMatch && difficultyMatch;
+    });
+  }, [selectedCategory, selectedDifficulty]);
+
   const handleSelectChallenge = useCallback((challenge: Challenge) => {
     setSelectedChallenge(challenge);
   }, []);
@@ -24,6 +33,14 @@ function App() {
   const handleSolved = useCallback(() => {
     setRefreshKey(k => k + 1);
   }, []);
+
+  const handleNext = useCallback(() => {
+    if (!selectedChallenge) return;
+    const currentIndex = filteredChallenges.findIndex(c => c.id === selectedChallenge.id);
+    if (currentIndex !== -1 && currentIndex < filteredChallenges.length - 1) {
+      setSelectedChallenge(filteredChallenges[currentIndex + 1]);
+    }
+  }, [selectedChallenge, filteredChallenges]);
 
   return (
     <div className="app">
@@ -39,6 +56,8 @@ function App() {
             challenge={selectedChallenge}
             onBack={handleBack}
             onSolved={handleSolved}
+            onNext={handleNext}
+            hasNext={filteredChallenges.findIndex(c => c.id === selectedChallenge.id) < filteredChallenges.length - 1}
           />
         ) : (
           <ChallengeList
