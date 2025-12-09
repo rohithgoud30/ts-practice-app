@@ -1,9 +1,15 @@
 import { useState, useEffect } from 'react';
 import { getProgressDB } from '../db';
 import { getTotalPoints } from '../data';
-import type { UserProgress } from '../types/challenge';
+import type { UserProgress, Challenge } from '../types/challenge';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  challenge?: Challenge | null;
+  onBack?: () => void;
+  solved?: boolean;
+}
+
+const Header: React.FC<HeaderProps> = ({ challenge, onBack, solved }) => {
   const [progress, setProgress] = useState<UserProgress>({ solvedChallenges: [], totalPoints: 0 });
   const [loading, setLoading] = useState(true);
   const maxPoints = getTotalPoints();
@@ -35,13 +41,14 @@ const Header: React.FC = () => {
   if (loading) {
     return (
       <header className="app-header">
-        <div className="logo">
-          <span className="logo-icon">⚡</span>
-          <h1>TS Master</h1>
+        <div className="logo-group">
+          <div className="logo">
+            <span className="logo-icon">⚡</span>
+            <h1>TS Master</h1>
+          </div>
+          <span className="logo-divider">|</span>
+          <span className="logo-subtitle">Practice Arena</span>
         </div>
-        <nav className="nav-links">
-          <a href="#" className="active">Practice Arena</a>
-        </nav>
         <div className="header-right">
           <div className="stats">
             <div className="stat">
@@ -56,14 +63,37 @@ const Header: React.FC = () => {
 
   return (
     <header className="app-header">
-      <div className="logo">
-        <span className="logo-icon">⚡</span>
-        <h1>TS Master</h1>
+      <div className="logo-group">
+        {challenge && onBack ? (
+          <>
+            <div className="back-btn" onClick={onBack}>
+              <span>←</span>
+            </div>
+            <span className="logo-divider">|</span>
+            <div className="challenge-header-info">
+              <span className="challenge-header-title">{challenge.title}</span>
+              <div className="challenge-header-meta">
+                <span className={`badge ${challenge.difficulty}`}>
+                  {challenge.difficulty}
+                </span>
+                <span className="badge xp-badge">+{challenge.points} XP</span>
+                {solved && (
+                  <span className="badge solved-badge">✓ Solved</span>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="logo">
+              <span className="logo-icon">⚡</span>
+              <h1>TS Master</h1>
+            </div>
+            <span className="logo-divider">|</span>
+            <span className="logo-subtitle">Practice Arena</span>
+          </>
+        )}
       </div>
-
-      <nav className="nav-links">
-        <a href="#" className="active">Practice Arena</a>
-      </nav>
 
       <div className="header-right">
         <div className="stats">

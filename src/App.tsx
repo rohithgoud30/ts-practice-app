@@ -29,6 +29,8 @@ function App() {
     <div className="app">
       <Header 
         key={`header-${refreshKey}`}
+        challenge={selectedChallenge}
+        onBack={selectedChallenge ? handleBack : undefined}
       />
       
       <main className="main-content">
