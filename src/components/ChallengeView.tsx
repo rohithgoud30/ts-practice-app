@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { Challenge, TestResult } from '../types/challenge';
-// import { DIFFICULTY_COLORS } from '../types/challenge';
 import CodeEditor from './CodeEditor';
 import TestResults from './TestResults';
 import { executeCode } from '../utils/testRunner';
-import { markChallengeSolved, isChallengeSolved } from '../utils/progress';
+import { markChallengeSolvedDB, isChallengeSolvedDB } from '../db';
 
 interface ChallengeViewProps {
   challenge: Challenge;
@@ -28,10 +27,19 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challenge, onBack, onSolv
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
-    setCode(challenge.starterCode);
-    setResults([]);
-    setSolved(isChallengeSolved(challenge.id));
-    setShowSolution(false);
+    const initChallenge = async () => {
+      setCode(challenge.starterCode);
+      setResults([]);
+      setShowSolution(false);
+      try {
+        const isSolved = await isChallengeSolvedDB(challenge.id);
+        setSolved(isSolved);
+      } catch (error) {
+        console.error('Failed to check solved status:', error);
+        setSolved(false);
+      }
+    };
+    initChallenge();
   }, [challenge]);
 
   // Handle resize
@@ -73,22 +81,29 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challenge, onBack, onSolv
     };
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
-  const runTests = () => {
+  const runTests = async () => {
     setIsRunning(true);
     setResults([]);
 
-    setTimeout(() => {
-      const testResults = executeCode(code, challenge.testCases);
-      setResults(testResults);
-      setIsRunning(false);
+    // Small delay for UI feedback
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const testResults = executeCode(code, challenge.testCases);
+    setResults(testResults);
+    setIsRunning(false);
 
-      const allPassed = testResults.every(r => r.passed);
-      if (allPassed && !solved) {
-        markChallengeSolved(challenge.id, challenge.points);
+    const allPassed = testResults.every(r => r.passed);
+    if (allPassed && !solved) {
+      try {
+        await markChallengeSolvedDB(challenge.id, challenge.points);
         setSolved(true);
+        // Dispatch custom event to notify other components
+        window.dispatchEvent(new CustomEvent('progress-updated'));
         onSolved();
+      } catch (error) {
+        console.error('Failed to save progress:', error);
       }
-    }, 300);
+    }
   };
 
   const resetCode = () => {

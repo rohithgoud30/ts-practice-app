@@ -1,6 +1,7 @@
+import { useState, useEffect } from 'react';
 import type { Challenge, Category, Difficulty } from '../types/challenge';
 import { CATEGORY_LABELS, DIFFICULTY_COLORS } from '../types/challenge';
-import { isChallengeSolved } from '../utils/progress';
+import { getSolvedChallenges } from '../db';
 
 interface ChallengeListProps {
   challenges: Challenge[];
@@ -38,8 +39,31 @@ const ChallengeList: React.FC<ChallengeListProps> = ({
   onCategoryChange,
   onDifficultyChange,
 }) => {
+  const [solvedIds, setSolvedIds] = useState<string[]>([]);
   const categories = Object.keys(CATEGORY_LABELS) as Category[];
   const difficulties: Difficulty[] = ['easy', 'medium', 'hard'];
+
+  useEffect(() => {
+    const loadSolved = async () => {
+      try {
+        const solved = await getSolvedChallenges();
+        setSolvedIds(solved);
+      } catch (error) {
+        console.error('Failed to load solved challenges:', error);
+      }
+    };
+    loadSolved();
+  }, []);
+
+  // Listen for progress updates
+  useEffect(() => {
+    const handleProgressUpdate = async () => {
+      const solved = await getSolvedChallenges();
+      setSolvedIds(solved);
+    };
+    window.addEventListener('progress-updated', handleProgressUpdate);
+    return () => window.removeEventListener('progress-updated', handleProgressUpdate);
+  }, []);
 
   const filteredChallenges = challenges.filter(c => {
     if (selectedCategory !== 'all' && c.category !== selectedCategory) return false;
@@ -51,8 +75,10 @@ const ChallengeList: React.FC<ChallengeListProps> = ({
     const list = category 
       ? challenges.filter(c => c.category === category)
       : challenges;
-    return list.filter(c => isChallengeSolved(c.id)).length;
+    return list.filter(c => solvedIds.includes(c.id)).length;
   };
+
+  const isChallengeSolved = (id: string) => solvedIds.includes(id);
 
   return (
     <div className="challenge-list-container">
