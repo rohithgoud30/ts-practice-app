@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS solved_challenges (
     challenge_id TEXT NOT NULL UNIQUE,
     solved_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     points INTEGER NOT NULL DEFAULT 0,
-    attempts INTEGER NOT NULL DEFAULT 1
+    attempts INTEGER NOT NULL DEFAULT 1,
+    user_code TEXT
 );
 
 -- Table to store user progress summary

@@ -3,7 +3,7 @@ import type { Challenge, TestResult } from '../types/challenge';
 import CodeEditor from './CodeEditor';
 import TestResults from './TestResults';
 import { executeCode } from '../utils/testRunner';
-import { markChallengeSolvedDB, isChallengeSolvedDB } from '../db';
+import { markChallengeSolvedDB, getChallengeDetails } from '../db';
 
 interface ChallengeViewProps {
   challenge: Challenge;
@@ -30,14 +30,21 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challenge, onBack: _onBac
 
   useEffect(() => {
     const initChallenge = async () => {
-      setCode(challenge.starterCode);
       setResults([]);
       setShowSolution(false);
       try {
-        const isSolved = await isChallengeSolvedDB(challenge.id);
-        setSolved(isSolved);
+        const details = await getChallengeDetails(challenge.id);
+        if (details && details.userCode) {
+          // Load saved user code if available
+          setCode(details.userCode);
+          setSolved(true);
+        } else {
+          setCode(challenge.starterCode);
+          setSolved(!!details);
+        }
       } catch (error) {
-        console.error('Failed to check solved status:', error);
+        console.error('Failed to load challenge details:', error);
+        setCode(challenge.starterCode);
         setSolved(false);
       }
     };
@@ -97,7 +104,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challenge, onBack: _onBac
     const allPassed = testResults.every(r => r.passed);
     if (allPassed && !solved) {
       try {
-        await markChallengeSolvedDB(challenge.id, challenge.points);
+        await markChallengeSolvedDB(challenge.id, challenge.points, code);
         setSolved(true);
         // Dispatch custom event to notify other components
         window.dispatchEvent(new CustomEvent('progress-updated'));

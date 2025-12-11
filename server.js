@@ -69,24 +69,24 @@ app.get('/api/challenges/:id/status', (req, res) => {
 app.post('/api/challenges/:id/solve', (req, res) => {
   try {
     const { id } = req.params;
-    const { points } = req.body;
+    const { points, userCode } = req.body;
     
     // Check if already solved
     const checkStmt = db.prepare('SELECT 1 FROM solved_challenges WHERE challenge_id = ? LIMIT 1');
     const exists = checkStmt.get(id);
     
     if (!exists) {
-      // Insert new solved challenge
-      const insertStmt = db.prepare('INSERT INTO solved_challenges (challenge_id, points) VALUES (?, ?)');
-      insertStmt.run(id, points || 0);
+      // Insert new solved challenge with user code
+      const insertStmt = db.prepare('INSERT INTO solved_challenges (challenge_id, points, user_code) VALUES (?, ?, ?)');
+      insertStmt.run(id, points || 0, userCode || null);
       
       // Update total points
       const updateStmt = db.prepare('UPDATE user_progress SET total_points = total_points + ?, last_updated = CURRENT_TIMESTAMP WHERE id = 1');
       updateStmt.run(points || 0);
     } else {
-      // Increment attempts
-      const updateAttempts = db.prepare('UPDATE solved_challenges SET attempts = attempts + 1 WHERE challenge_id = ?');
-      updateAttempts.run(id);
+      // Update attempts and user code
+      const updateStmt = db.prepare('UPDATE solved_challenges SET attempts = attempts + 1, user_code = ? WHERE challenge_id = ?');
+      updateStmt.run(userCode || null, id);
     }
     
     // Return updated progress
@@ -120,11 +120,11 @@ app.delete('/api/progress', (req, res) => {
 app.get('/api/challenges/:id/details', (req, res) => {
   try {
     const { id } = req.params;
-    const stmt = db.prepare('SELECT solved_at, attempts FROM solved_challenges WHERE challenge_id = ?');
+    const stmt = db.prepare('SELECT solved_at, attempts, user_code FROM solved_challenges WHERE challenge_id = ?');
     const result = stmt.get(id);
     
     if (result) {
-      res.json({ solvedAt: result.solved_at, attempts: result.attempts });
+      res.json({ solvedAt: result.solved_at, attempts: result.attempts, userCode: result.user_code });
     } else {
       res.json(null);
     }

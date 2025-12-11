@@ -28,12 +28,12 @@ export const isChallengeSolvedDB = async (challengeId: string): Promise<boolean>
 };
 
 // Mark a challenge as solved
-export const markChallengeSolvedDB = async (challengeId: string, points: number): Promise<UserProgress> => {
+export const markChallengeSolvedDB = async (challengeId: string, points: number, userCode?: string): Promise<UserProgress> => {
   try {
     const response = await fetch(`${API_BASE}/challenges/${challengeId}/solve`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ points })
+      body: JSON.stringify({ points, userCode })
     });
     if (!response.ok) throw new Error('Failed to mark as solved');
     return response.json();
@@ -63,6 +63,7 @@ export const resetProgressDB = async (): Promise<void> => {
 export const getChallengeDetails = async (challengeId: string): Promise<{
   solvedAt: string | null;
   attempts: number;
+  userCode: string | null;
 } | null> => {
   try {
     const response = await fetch(`${API_BASE}/challenges/${challengeId}/details`);
