@@ -36,21 +36,20 @@ export const executeCode = (code: string, testCases: { id: string; input: string
     }));
   }
 
+  // Extract the function name from the transpiled code (done once outside the loop)
+  const functionMatch = jsCode.match(/function\s+(\w+)/);
+  const fnName = functionMatch ? functionMatch[1] : null;
+
   for (const testCase of testCases) {
     try {
       // Create a function from the transpiled JS code
       const fullCode = `
         ${jsCode}
         
-        // Find the main function and execute it
-        const functionMatch = jsCode.match(/function\\s+(\\w+)/);
-        if (functionMatch) {
-          const fnName = functionMatch[1];
-          const fn = eval(fnName);
-          if (typeof fn === 'function') {
-            const result = fn(${testCase.input || ''});
-            return result;
-          }
+        // Execute the main function
+        if (typeof ${fnName} === 'function') {
+          const result = ${fnName}(${testCase.input || ''});
+          return result;
         }
         return undefined;
       `;
