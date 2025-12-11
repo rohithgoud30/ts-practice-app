@@ -243,7 +243,9 @@ textAlign("hi", 6)
     return { left, right, center };
 }`,
     testCases: [
-      { id: '1', input: '"hi", 6', expectedOutput: '{"left":"hi    ","right":"    hi","center":"  hi  "}' }
+      { id: '1', input: '"hi", 6', expectedOutput: '{"left":"hi    ","right":"    hi","center":"  hi  "}' },
+      { id: '2', input: '"abc", 7', expectedOutput: '{"left":"abc    ","right":"    abc","center":"  abc  "}' },
+      { id: '3', input: '"x", 5', expectedOutput: '{"left":"x    ","right":"    x","center":"  x  "}' }
     ]
   },
   {

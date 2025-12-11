@@ -43,7 +43,7 @@ export const executeCode = (code: string, testCases: { id: string; input: string
         ${jsCode}
         
         // Find the main function and execute it
-        const functionMatch = \`${jsCode}\`.match(/function\\s+(\\w+)/);
+        const functionMatch = jsCode.match(/function\\s+(\\w+)/);
         if (functionMatch) {
           const fnName = functionMatch[1];
           const fn = eval(fnName);
@@ -91,9 +91,9 @@ export const executeCode = (code: string, testCases: { id: string; input: string
       // Normalize expected output for comparison
       let normalizedExpected = testCase.expectedOutput;
       
-      // Compare
+      // Compare - only trim leading/trailing whitespace, preserve internal whitespace
       const passed = formattedOutput === normalizedExpected || 
-                     formattedOutput.replace(/\s/g, '') === normalizedExpected.replace(/\s/g, '');
+                     formattedOutput.trim() === normalizedExpected.trim();
 
       results.push({
         testId: testCase.id,
