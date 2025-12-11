@@ -127,7 +127,7 @@ mutateString("hello", 3, 'a') // Returns: "helao"
 }`,
     testCases: [
       { id: '1', input: '"hello", 3, "a"', expectedOutput: 'helao' },
-      { id: '2', input: '"abracadabra", 5, "k"', expectedOutput: 'abracakabra' }
+      { id: '2', input: '"abracadabra", 5, "k"', expectedOutput: 'abrackdabra' }
     ]
   },
   {
