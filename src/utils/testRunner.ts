@@ -88,11 +88,18 @@ export const executeCode = (code: string, testCases: { id: string; input: string
       }
 
       // Normalize expected output for comparison
-      let normalizedExpected = testCase.expectedOutput;
+      const normalizedExpected = testCase.expectedOutput;
       
-      // Compare - only trim leading/trailing whitespace, preserve internal whitespace
+      // Normalize function to handle whitespace differences in JSON
+      const normalizeForComparison = (str: string): string => {
+        // Remove spaces after colons and commas in JSON-like strings
+        return str.trim().replace(/\s+/g, ' ').replace(/\[\s+/g, '[').replace(/\s+\]/g, ']').replace(/,\s+/g, ',').replace(/:\s+/g, ':');
+      };
+      
+      // Compare - normalize both strings to handle whitespace differences
       const passed = formattedOutput === normalizedExpected || 
-                     formattedOutput.trim() === normalizedExpected.trim();
+                     formattedOutput.trim() === normalizedExpected.trim() ||
+                     normalizeForComparison(formattedOutput) === normalizeForComparison(normalizedExpected);
 
       results.push({
         testId: testCase.id,

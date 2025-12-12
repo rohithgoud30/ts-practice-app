@@ -93,7 +93,9 @@ const ChallengeList: React.FC<ChallengeListProps> = ({
               <span className="cat-label">All Challenges</span>
               <span className="count">{getSolvedCount()}/{challenges.length}</span>
             </li>
-            {categories.map(cat => {
+            {categories
+              .filter(cat => challenges.some(c => c.category === cat))
+              .map(cat => {
               const catChallenges = challenges.filter(c => c.category === cat);
               return (
                 <li 
